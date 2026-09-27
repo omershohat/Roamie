@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+body {
+  font-family: "Outfit", sans-serif;
+  background-color: white;
+}
+
+@theme {
+  --color-primary: oklch(43.2% 0.095 166.913);
+  --color-light-primary: oklch(59.6% 0.145 163.225);
+  --color-mid-dark-primary: oklch(0.4105 0.081 170.52);
+  --color-dark-primary: oklch(26.2% 0.051 172.552);
+}
