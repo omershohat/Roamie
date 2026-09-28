@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
     return res.status(200).json({ trips: userTrips });
   } catch (err) {
     console.log(err);
-    res.status(500).send("could not fetch trips");
+    res.status(500).json({ error: "could not fetch trips" });
   }
 });
 
@@ -60,7 +60,7 @@ router.post("/", async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).send("could not create new trip");
+    res.status(500).json({ error: "could not create new trip" });
   }
 });
 
@@ -78,13 +78,18 @@ router.put("/:id", async (req, res) => {
 
     const { destination, startDate, endDate } = req.body;
 
+    const updateData = {
+      ...(destination && { destination }),
+      ...(startDate && { startDate }),
+      ...(endDate !== undefined && { endDate }),
+    };
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: "No fields provided for update" });
+    }
+
     const [updatedTrip] = await db
       .update(trips)
-      .set({
-        ...(destination && { destination }),
-        ...(startDate && { startDate }),
-        ...(endDate !== undefined && { endDate }),
-      })
+      .set(updateData)
       .where(and(eq(trips.userId, userId), eq(trips.id, tripId)))
       .returning();
 
@@ -99,7 +104,7 @@ router.put("/:id", async (req, res) => {
       .json({ message: "Trip updated successfully", updatedTrip });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Failed to update trip");
+    res.status(500).json({ error: "Failed to update trip" });
   }
 });
 
@@ -129,10 +134,10 @@ router.delete("/:id", async (req, res) => {
         .json({ error: "trip not found or unauthorized to delete" });
     }
 
-    return res.json({ message: "trip has been deleted", delTrip });
+    return res.status(200).json({ message: "trip has been deleted", delTrip });
   } catch (err) {
     console.log(err);
-    res.status(500).send("could not delete trip");
+    res.status(500).json({ error: "could not delete trip" });
   }
 });
 
