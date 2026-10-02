@@ -1,4 +1,4 @@
-import Card from "./Card";
+import Card from "./HomeCard";
 export default function Cards() {
   return (
     <section className="max-w-3xl xs:max-w-xl lg:max-w-5xl h-auto mx-auto grid gap-7 grid-cols-[repeat(auto-fit,minmax(13.75rem,1fr))]">

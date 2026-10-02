@@ -57,7 +57,7 @@ function Signin() {
 
       const user = await userFound.json();
 
-      console.log(`User first name: ${user.firstName}`);
+      console.log(`New sign in: ${user.firstName}`);
 
       navigate("/MyTrips", { state: { user } });
     } catch (err) {

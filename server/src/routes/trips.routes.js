@@ -1,6 +1,6 @@
 import express from "express";
 import { db } from "../db.js";
-import { trips } from "../db/schema.js";
+import { trips, users } from "../db/schema.js";
 import { eq, and } from "drizzle-orm";
 
 const router = express.Router();
@@ -11,16 +11,42 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const userId = req.userId;
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
 
     const userTrips = await db
       .select()
       .from(trips)
       .where(eq(trips.userId, userId));
 
-    return res.status(200).json({ trips: userTrips });
+    return res
+      .status(200)
+      .json({ userFirstName: user.firstName, trips: userTrips });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "could not fetch trips" });
+  }
+});
+
+// --------------------------------
+// Get a Trip - GET /trips/:id
+// --------------------------------
+router.get("/:id", async (req, res) => {
+  try {
+    const userId = req.userId;
+    const tripId = req.params.id;
+    console.log(`[tripRoutes] user ID: ${userId}, trip ID: ${tripId}`);
+
+    const [userTrip] = await db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.userId, userId), eq(trips.id, tripId)));
+
+    console.log(`[tripRoutes] trip:${JSON.stringify(userTrip)}`);
+
+    return res.status(200).json({ trip: userTrip });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "could not fetch the requested trip" });
   }
 });
 
@@ -30,7 +56,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     // destruct trip details
-    const { destination, startDate, endDate } = req.body;
+    const { destination, countryCode, startDate, endDate } = req.body;
 
     // extract user after verified
     const userId = req.userId;
@@ -48,6 +74,7 @@ router.post("/", async (req, res) => {
       .values({
         userId,
         destination,
+        countryCode,
         startDate,
         endDate,
       })
@@ -76,10 +103,11 @@ router.put("/:id", async (req, res) => {
 
     const userId = req.userId;
 
-    const { destination, startDate, endDate } = req.body;
+    const { destination, countryCode, startDate, endDate } = req.body;
 
     const updateData = {
       ...(destination && { destination }),
+      ...(countryCode && { countryCode }),
       ...(startDate && { startDate }),
       ...(endDate !== undefined && { endDate }),
     };

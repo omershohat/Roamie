@@ -4,6 +4,7 @@ function authMiddleware(req, res, next) {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
+    console.log("no token provided");
     return res.status(401).json({ message: "No token provided." });
   }
 
@@ -13,6 +14,7 @@ function authMiddleware(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_JWT_SECRET, (err, decoded) => {
     if (err) {
+      console.log(err);
       return res.status(401).json({ message: "Invalid token" });
     }
 

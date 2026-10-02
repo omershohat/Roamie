@@ -23,6 +23,7 @@ export const trips = pgTable("trips", {
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   destination: varchar("destination", { length: 255 }).notNull(),
+  countryCode: varchar("country_code", { length: 4 }),
   startDate: date("start_date").notNull(),
   endDate: date("end_date"),
   createdAt: timestamp("created_at").defaultNow(),
